@@ -109,11 +109,11 @@ end
 H = [];
 ru = b;
 rl = b;
-[xx, fmin, errnum, extra] = cvx_run_solver( @opti_cbc, H, full(c), At', full(rl), full(ru), lb, ub, vtype, 'xx', 'fmin', 'errnum', 'extra', settings, 8);
+[xx, fmin, errnum, extra, yy, zz] = cvx_run_solver( @opti_cbc, H, full(c), At', full(rl), full(ru), lb, ub, vtype, 'xx', 'fmin', 'errnum', 'extra', 'yy', 'zz', settings, 8);
 iters = extra.Nodes;
 x = full( xx );
-y = zeros(size(At,2), 1);
-z = zeros(length(c), 1);
+y = full( yy );
+z = full( zz );
 if ~isempty( rr )
   x = reord * x;
 end
@@ -125,7 +125,17 @@ elseif strncmp(status,'Gap Reached', 3)
 else
   tol = prec(2);
 end
-
+if strncmp(status, 'Integer Optimal', 3) || strncmp(status, 'Gap Reached', 3)
+  status = 'Solved';
+elseif strncmp(status, 'Gap Reached', 3) || strncmp(status, 'Maximum', 3) || strncmp(status, 'Number', 3)
+  status = 'Inaccurate/Solved';
+elseif strncmp(status, 'Linear Relaxation Infeasible', 21) || strncmp(status, 'Proven Infeasible', 3)
+  status = 'Infeasible';
+elseif strncmp(status, 'Linear Relaxation Unbounded', 3)
+  status = 'Unbounded';
+else
+  status = 'Failed';
+end
 % Copyright 2005-2016 CVX Research, Inc.
 % See the file LICENSE.txt for full copyright information.
 % The command 'cvx_where' will show where this file is located.
