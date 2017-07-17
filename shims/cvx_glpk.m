@@ -114,7 +114,7 @@ if quiet,
 else
   param.msglev = 2;
 end
-param.scale = 128;
+param.scale = 1;
 param.tolbnd = prec(1);
 param.toldj = prec(1);
 param.tolobj = prec(1);
